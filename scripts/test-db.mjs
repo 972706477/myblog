@@ -31,7 +31,7 @@ try {
 const required = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
 const missing = required.filter((key) => !env[key] || env[key].startsWith('在这里填'))
 if (missing.length > 0) {
-  console.error(`❌ .env.local 里这些还没填：${missing.join('、'))}`)
+  console.error(`❌ .env.local 里这些还没填：${missing.join('、')}`)
   process.exit(1)
 }
 
