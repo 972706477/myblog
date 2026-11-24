@@ -1,0 +1,30 @@
+/*
+ * Astryx 的样式引入，顺序不能换（对应 CSS 层级 cascade）：
+ * 1. 各主题字体  2. 样式重置  3. 组件样式  4. 各主题变量
+ *
+ * 每套主题的 theme.css 都按 data-astryx-theme="<主题名>" 属性隔离，
+ * 所以 7 套可以同时引入，切换主题时由 <Theme> 组件切换属性即可。
+ */
+@import '@astryxdesign/theme-neutral/fonts.css';
+@import '@astryxdesign/theme-butter/fonts.css';
+@import '@astryxdesign/theme-chocolate/fonts.css';
+@import '@astryxdesign/theme-matcha/fonts.css';
+@import '@astryxdesign/theme-stone/fonts.css';
+@import '@astryxdesign/theme-gothic/fonts.css';
+@import '@astryxdesign/theme-y2k/fonts.css';
+
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+
+@import '@astryxdesign/theme-neutral/theme.css';
+@import '@astryxdesign/theme-butter/theme.css';
+@import '@astryxdesign/theme-chocolate/theme.css';
+@import '@astryxdesign/theme-matcha/theme.css';
+@import '@astryxdesign/theme-stone/theme.css';
+@import '@astryxdesign/theme-gothic/theme.css';
+@import '@astryxdesign/theme-y2k/theme.css';
+
+/* 这几份样式表不会设置正文字体，需要我们在 body 上指定 */
+body {
+  font-family: var(--font-family-body);
+}

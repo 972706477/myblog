@@ -1,0 +1,25 @@
+{
+  "name": "astryx-blog",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@astryxdesign/core": "^0.7.17",
+    "@astryxdesign/theme-butter": "^0.7.17",
+    "@astryxdesign/theme-chocolate": "^0.7.17",
+    "@astryxdesign/theme-gothic": "^0.7.17",
+    "@astryxdesign/theme-matcha": "^0.7.17",
+    "@astryxdesign/theme-neutral": "^0.7.17",
+    "@astryxdesign/theme-stone": "^0.7.17",
+    "@astryxdesign/theme-y2k": "^0.7.17",
+    "@stylexjs/stylex": "^0.19.2",
+    "mysql2": "^3.24.6",
+    "next": "^15.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}
