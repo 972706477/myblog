@@ -180,14 +180,14 @@ Astryx 自带 7 套主题，导航栏右侧的下拉框可以**实时切换**，
 | `app/api/**` | Next.js 自带的后端接口（读公开、写要登录） |
 | `database/*.sql` | 建表脚本 + 种子数据 |
 
-**启用步骤：**
+**启用步骤（在服务器上操作）：**
 
 1. 宝塔 → 数据库 → 添加数据库（记下库名、用户名、密码）
 2. phpMyAdmin 导入 `database/schema.mysql.sql`，再导入 `database/seed.mysql.sql`
 3. 复制 `.env.example` 为 `.env.local`，填数据库连接、`ADMIN_PASSWORD`（后台登录密码）、`ADMIN_SECRET`（随机长字符串）
-4. 重启 `npm run dev`（或部署时 `npm run build && npm start`）
+4. `npm run build && bash scripts/deploy.sh`（详见下方「部署到自己的服务器」）
 
-没配 `.env.local` 时：前台照常运行（静态文件数据），后台保存会提示“数据库未配置”。
+本地开发不需要配 `.env.local`：前台自动使用静态文件数据，功能完整；只有后台保存需要数据库。
 
 ## 备注
 
@@ -197,15 +197,57 @@ Astryx 自带 7 套主题，导航栏右侧的下拉框可以**实时切换**，
 
 ## 部署到自己的服务器（宝塔）
 
+采用“本地开发 + 服务器部署”模式：本地不连数据库（自动用静态文件数据），数据库只在服务器上启用。
+
+**服务器一次性配置：**
+
 ```bash
-# 1. 宝塔 → 软件商店 → 安装 Node 项目（Node 20+）和 PM2
-# 2. 把项目代码上传到服务器（或 git clone），在项目目录：
+# 1. 宝塔 → 软件商店 → 安装「Node 项目」（选 Node 20+）和 PM2 管理器
+# 2. 拉取代码（仓库已推送到 GitHub）
+cd /www/wwwroot
+git clone https://github.com/你的用户名/myblog.git
+cd myblog
+
+# 3. 创建环境配置（数据库填宝塔里建的那个，注意 DB_HOST 用 127.0.0.1）
+cp .env.example .env.local
+nano .env.local        # 填 DB_* 四项 + ADMIN_PASSWORD + ADMIN_SECRET，保存退出
+
+# 4. 数据库导入（如果还没导）：phpMyAdmin → 选中库 → 导入 schema.mysql.sql → 再导 seed.mysql.sql
+#    或者用命令行：mysql -u blog -p blog < database/schema.mysql.sql
+
+# 5. 安装 pm2（宝塔 PM2 管理器会自动装；没有就手动）
+npm i -g pm2
+
+# 6. 构建并启动
 npm install
-# 3. 配置 .env.local（数据库连接 + 后台密码 + 签名密钥）
-# 4. 构建并启动（构建时要能连上数据库，SSG 页面在构建时查库）：
-npm run build
-pm2 start npm --name blog -- start
-pm2 save
+npm run build          # SSG 页面在构建时查库，.env.local 必须已配好
+bash scripts/deploy.sh # 之后每次更新代码，跑这个脚本即可（拉取→构建→重启）
 ```
 
-5. 宝塔 → 网站 → 反向代理：把域名指向 `http://127.0.0.1:3000`
+**绑定域名：** 宝塔 → 网站 → 添加站点（PHP 版本选“纯静态”）→ 站点设置 → 反向代理 → 目标 URL 填 `http://127.0.0.1:3000`。之后访问域名即可，后台在 `https://你的域名/admin`。
+
+> 本地开发不需要配 `.env.local` 的数据库部分——注释掉即可，程序自动使用静态文件数据。
+
+## 自动化部署（GitHub Actions）
+
+代码里已带 `.github/workflows/deploy.yml`：**每次 `git push` 到 main 分支，GitHub 会自动 SSH 上服务器，拉代码 → 装依赖 → 构建 → 重启**。配置一次，以后部署就是 `git push` 一条命令。
+
+**一次性设置（3 步）：**
+
+1. **生成部署专用密钥**（在服务器上执行）：
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -N ""
+   cat ~/.ssh/authorized_keys >> /dev/null  # 确保目录存在
+   cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+   cat ~/.ssh/deploy_key   # 复制输出的私钥内容
+   ```
+2. **在 GitHub 配 Secrets**：仓库 → Settings → Secrets and variables → Actions → New repository secret，添加：
+   - `SERVER_HOST` = 服务器公网 IP
+   - `SERVER_USER` = `root`
+   - `SERVER_SSH_KEY` = 上一步复制的私钥全文
+   - `SERVER_PORT` = SSH 端口（宝塔默认 22，改过才需要填）
+   - `SERVER_PATH` = 项目目录（默认 `/www/wwwroot/myblog`，不一样才需要填）
+3. **推送代码**：`git push` —— GitHub 仓库页面的 Actions 标签页能看到部署日志，绿色勾就是成功。
+
+> 免费额度：公开仓库无限次，私有仓库每月 2000 分钟——个人博客永远用不完。
+> `.env.local` 在服务器上本地保管，流水线不会碰它，密码不会外泄。

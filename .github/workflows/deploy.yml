@@ -1,0 +1,46 @@
+# ============================================================================
+# 自动化部署：push 到 GitHub 后，自动登录服务器拉代码、构建、重启
+#
+# 触发条件：main 分支收到 push（也就是你 git push 的时候）
+#
+# 需要在 GitHub 仓库里配置 3 个 Secrets（Settings → Secrets and variables → Actions）：
+#   SERVER_HOST     服务器公网 IP
+#   SERVER_USER     SSH 登录用户名（一般是 root）
+#   SERVER_SSH_KEY  SSH 私钥（部署专用密钥的私钥部分）
+# 可选：
+#   SERVER_PORT     SSH 端口（不是 22 时才需要，宝塔改过端口就填）
+#   SERVER_PATH     项目在服务器上的目录（默认 /www/wwwroot/myblog）
+# ============================================================================
+
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 允许在 GitHub 网页上手动触发
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect and deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            set -e
+            cd ${{ secrets.SERVER_PATH || '/www/wwwroot/myblog' }}
+            git pull
+            npm install
+            npm run build
+            if pm2 describe blog > /dev/null 2>&1; then
+              pm2 restart blog
+            else
+              pm2 start npm --name blog -- start
+              pm2 save
+            fi
+            echo "==> Deployed at $(date)"
