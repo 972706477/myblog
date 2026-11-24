@@ -1,113 +1,24 @@
 'use client'
+import Link from 'next/link'
+import {useSiteTheme} from '@/app/providers'
+import s from './HomeView.module.css'
 
-import {useRouter} from 'next/navigation'
-import {Avatar} from '@astryxdesign/core/Avatar'
-import {Badge} from '@astryxdesign/core/Badge'
-import {Button} from '@astryxdesign/core/Button'
-import {Center} from '@astryxdesign/core/Center'
-import {ClickableCard} from '@astryxdesign/core/ClickableCard'
-import {Grid, GridSpan} from '@astryxdesign/core/Grid'
-import {HStack} from '@astryxdesign/core/HStack'
-import {Heading} from '@astryxdesign/core/Heading'
-import {Icon} from '@astryxdesign/core/Icon'
-import {Link} from '@astryxdesign/core/Link'
-import {Stack} from '@astryxdesign/core/Stack'
-import {Text} from '@astryxdesign/core/Text'
-import NoteList from './NoteList.jsx'
-import ProjectCard, {statusVariant} from './ProjectCard.jsx'
+function Arrow(){return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>}
 
-// 首页视图：个人介绍 + 精选作品 + 最新笔记（数据由服务端页面传入）
-export default function HomeView({projects, notes, author}) {
-  const router = useRouter()
-  const featured = projects.find((p) => p.featured) ?? projects[0]
-  const otherProjects = projects.filter((p) => p !== featured)
-  const latestNotes = notes.slice(0, 4)
-
-  return (
-    <Stack gap={8} paddingBlock={6}>
-      {/* 个人介绍 */}
-      <Stack gap={4}>
-        <HStack gap={4} vAlign="center" wrap="wrap">
-          <Avatar name={author.name} size="lg" />
-          <Stack gap={2} maxWidth={640}>
-            <Heading level={1} type="display-1">
-              你好，我是 {author.name}
-            </Heading>
-            <Text type="large">{author.bio}</Text>
-          </Stack>
-        </HStack>
-        <Text type="supporting">
-          {projects.length} 个项目 · {notes.length} 篇笔记 · 从 2024 年折腾到现在
-        </Text>
-        <Text type="supporting">提示：按 Ctrl / ⌘ + K 可以随时搜索文章</Text>
-        <HStack gap={2} wrap="wrap">
-          <Button label="看看我的作品" variant="primary" onClick={() => router.push('/projects')} />
-          <Button label="读读技术笔记" variant="secondary" onClick={() => router.push('/notes')} />
-        </HStack>
-      </Stack>
-
-      {/* 精选作品：置顶项目横卡 + 其余项目网格 */}
-      <Stack gap={4}>
-        <HStack justify="between" vAlign="center" wrap="wrap" gap={3}>
-          <Heading level={2}>精选作品</Heading>
-          <Link href="/projects" isStandalone>
-            查看全部 {projects.length} 个项目 →
-          </Link>
-        </HStack>
-
-        <Grid columns={{minWidth: 280, max: 2}} gap={4}>
-          <GridSpan span={2}>
-            <ClickableCard
-              href={`/projects/${featured.slug}`}
-              label={`查看项目：${featured.name}`}
-              padding={0}
-              elevation="low"
-            >
-              <HStack gap={0} vAlign="stretch" wrap="wrap">
-                {/* 左侧图标区 */}
-                <Center width={200} padding={6}>
-                  <Icon icon={featured.icon} size="lg" style={{width: 56, height: 56}} />
-                </Center>
-                {/* 右侧内容 */}
-                <Stack gap={3} padding={6} style={{flex: '1 1 320px', minWidth: 0}}>
-                  <HStack gap={3} vAlign="center" wrap="wrap">
-                    <Badge variant="info" label="置顶项目" />
-                    <Badge variant={statusVariant[featured.status]} label={featured.status} />
-                    <Text type="supporting" hasTabularNumbers>
-                      {featured.year}
-                    </Text>
-                  </HStack>
-                  <Heading level={2}>{featured.name}</Heading>
-                  <Text type="body">{featured.tagline}</Text>
-                  <HStack gap={1} wrap="wrap">
-                    {featured.stack.map((tech) => (
-                      <Badge key={tech} variant="blue" label={tech} />
-                    ))}
-                  </HStack>
-                  <HStack gap={1} vAlign="center">
-                    <Text type="supporting">查看项目详情</Text>
-                    <Icon icon="chevronRight" size="sm" />
-                  </HStack>
-                </Stack>
-              </HStack>
-            </ClickableCard>
-          </GridSpan>
-          {otherProjects.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
-          ))}
-        </Grid>
-      </Stack>
-
-      {/* 最新笔记：编辑式列表 */}
-      <Stack gap={4}>
-        <HStack justify="between" vAlign="center" wrap="wrap" gap={3}>
-          <Heading level={2}>最新笔记</Heading>
-          <Link href="/notes" isStandalone>
-            查看全部 {notes.length} 篇 →
-          </Link>
-        </HStack>
-        <NoteList list={latestNotes} />
-      </Stack>
-    </Stack>
-  )
+export default function HomeView({projects=[],notes=[],author}){
+  const {mode}=useSiteTheme()
+  const featured=projects.find(p=>p.featured)??projects[0]
+  const others=projects.filter(p=>p!==featured).slice(0,3)
+  const latest=[...notes].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,4)
+  return <div className={s.home} data-mode={mode}>
+    <section className={s.intro} aria-labelledby="home-title">
+      <div><h1 id="home-title">你好，我是 <span>{author.name}。</span></h1><p className={s.bio}>{author.bio}</p><div className={s.actions}><Link className={s.primary} href="/projects">探索我的作品 <Arrow/></Link><Link className={s.textLink} href="/about">关于我 <Arrow/></Link></div></div>
+      <aside className={s.profile}><span className={s.monogram} aria-hidden="true">{Array.from(author.name||'A')[0]}</span><p>{author.role}</p><div className={s.profileLinks}><Link href="/projects">{projects.length} 个作品</Link><Link href="/notes">{notes.length} 篇笔记</Link></div></aside>
+    </section>
+    <section className={s.work} aria-labelledby="work-title">
+      <header className={s.sectionHead}><h2 id="work-title">把想法，做成作品。</h2><Link className={s.textLink} href="/projects">全部作品 <Arrow/></Link></header>
+      {featured?<div className={s.workGrid}><Link className={s.featured} href={`/projects/${featured.slug}`}><div className={s.meta}><span>精选作品</span><span>{featured.year} / {featured.status}</span></div><div className={s.featureBody}><h3>{featured.name}</h3><p>{featured.tagline}</p></div><div className={s.foot}><div className={s.tags}>{(featured.stack??[]).map(t=><span key={t}>{t}</span>)}</div><span className={s.roundArrow}><Arrow/></span></div></Link><div className={s.projectList}>{others.map(p=><Link className={s.project} key={p.slug} href={`/projects/${p.slug}`}><div className={s.meta}><span>{p.year}</span><span>{p.status}</span></div><h3>{p.name}</h3><p>{p.tagline}</p><div className={s.foot}><span>{(p.stack??[]).slice(0,2).join(' / ')}</span><Arrow/></div></Link>)}{!others.length&&<p className={s.empty}>更多想法，正在慢慢实现。</p>}</div></div>:<p className={s.empty}>作品整理中，欢迎先读读下面的笔记。</p>}
+    </section>
+    <section className={s.notes} aria-labelledby="notes-title"><div className={s.notesIntro}><h2 id="notes-title">边做，边记录。</h2><p>项目之外的思考，<br/>与学习路上的小小收获。</p><Link className={s.textLink} href="/notes">所有笔记 <Arrow/></Link></div><div>{latest.length?latest.map(n=><Link className={s.note} key={n.slug} href={`/notes/${n.slug}`}><div className={s.noteMeta}><time dateTime={n.date}>{String(n.date??'').slice(0,10)}</time><span>{n.readingTime} 分钟阅读</span></div><div className={s.noteTitle}><h3>{n.title}</h3><Arrow/></div><p>{n.excerpt}</p></Link>):<p className={s.empty}>还没有笔记，新的记录很快就来。</p>}</div></section>
+  </div>
 }
