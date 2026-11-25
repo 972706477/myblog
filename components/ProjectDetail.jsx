@@ -23,7 +23,7 @@ import {statusVariant} from './ProjectCard.jsx'
 
 // 项目详情视图：左侧正文 + 右侧信息栏（项目信息 + 目录）
 // 数据由服务端页面传入（构建时从数据库读取）
-export default function ProjectDetail({project, newer, older}) {
+export default function ProjectDetail({project, newer, older, recommendations}) {
   const router = useRouter()
 
   // 让 Markdown 的标题带上锚点 id，目录才能跳转和滚动监听
@@ -160,6 +160,7 @@ export default function ProjectDetail({project, newer, older}) {
       <HStack>
         <Button label="回到全部作品" variant="secondary" onClick={() => router.push('/projects')} />
       </HStack>
+      {recommendations}
     </Stack>
   )
 }

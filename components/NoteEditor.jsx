@@ -37,6 +37,8 @@ export default function NoteEditor({slug}) {
   const [tagsText, setTagsText] = useState('')
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importedFile, setImportedFile] = useState('')
   const [error, setError] = useState('')
 
   // 编辑模式：加载现有数据
@@ -60,6 +62,33 @@ export default function NoteEditor({slug}) {
   }, [slug, isNew])
 
   const update = (key) => (value) => setForm((prev) => ({...prev, [key]: value}))
+
+  const importMarkdown = async (event) => {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    input.value = ''
+    if (!file) return
+    setError('')
+    if (!/\.(md|markdown)$/i.test(file.name)) {
+      setError('请选择 .md 或 .markdown 文件')
+      return
+    }
+    setImporting(true)
+    try {
+      const content = new TextDecoder('utf-8', {fatal: true}).decode(await file.arrayBuffer())
+      if (!content.trim()) {
+        setError('Markdown 文件没有正文')
+        return
+      }
+      if (form.content.trim() && !window.confirm('导入会替换当前正文，是否继续？')) return
+      update('content')(content)
+      setImportedFile(file.name)
+    } catch {
+      setError('无法读取 Markdown 文件，请确认文件使用 UTF-8 编码')
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const handleSave = async () => {
     setError('')
@@ -106,6 +135,7 @@ export default function NoteEditor({slug}) {
             label={saving ? '保存中…' : '保存'}
             variant="primary"
             isLoading={saving}
+            isDisabled={importing}
             onClick={handleSave}
           />
         </HStack>
@@ -165,8 +195,16 @@ export default function NoteEditor({slug}) {
                 </Stack>
               </HStack>
               <Divider />
+              <label>
+                导入 Markdown 文件{' '}
+                <input type="file" accept=".md,.markdown" onChange={importMarkdown} disabled={importing || saving} />
+              </label>
+              <div role="status">
+                {importing ? '正在读取文件…' : importedFile ? `已导入 ${importedFile}` : ''}
+              </div>
               <TextArea
                 label="正文（Markdown）"
+                isDisabled={importing}
                 value={form.content}
                 onChange={update('content')}
                 rows={16}

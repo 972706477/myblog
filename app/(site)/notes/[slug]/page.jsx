@@ -1,6 +1,8 @@
+import ContentRecommendations from '@/components/ContentRecommendations'
+import {recommend} from '@/lib/recommendations'
 import {notFound} from 'next/navigation'
 import NoteDetail from '@/components/NoteDetail'
-import {getAllNotes} from '@/lib/data'
+import {getAllNotes, getAllProjects} from '@/lib/data'
 
 // SSG：构建时为每篇笔记生成一个静态 HTML 页面
 export async function generateStaticParams() {
@@ -18,7 +20,7 @@ export async function generateMetadata({params}) {
 
 export default async function Page({params}) {
   const {slug} = await params
-  const notes = await getAllNotes()
+  const [notes, projects] = await Promise.all([getAllNotes(), getAllProjects()])
   const index = notes.findIndex((n) => n.slug === slug)
   if (index === -1) notFound()
 
@@ -27,6 +29,7 @@ export default async function Page({params}) {
   return (
     <NoteDetail
       note={note}
+      recommendations={<ContentRecommendations items={recommend(note, "notes", notes, projects)} />}
       newer={index > 0 ? notes[index - 1] : null}
       older={index < notes.length - 1 ? notes[index + 1] : null}
     />

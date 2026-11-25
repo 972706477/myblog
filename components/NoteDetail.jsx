@@ -22,7 +22,7 @@ import {author} from '@/author.js'
 
 // 笔记详情视图：正文 + 右侧悬浮目录
 // 数据由服务端页面传入（构建时从数据库读取）
-export default function NoteDetail({note, newer, older}) {
+export default function NoteDetail({note, newer, older, recommendations}) {
   const router = useRouter()
 
   // 让 Markdown 的标题带上锚点 id，目录才能跳转和滚动监听
@@ -139,6 +139,7 @@ export default function NoteDetail({note, newer, older}) {
           <span />
         )}
       </HStack>
+      {recommendations}
     </Stack>
   )
 }
