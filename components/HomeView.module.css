@@ -23,3 +23,24 @@
 @media(max-width:1100px){.intro{padding:22px}.intro h1{font-size:27px}.featured{min-height:320px}.featureBody{padding:32px 0}}
 @media(max-width:760px){.home{padding:20px 12px 36px;gap:28px}.home h2{font-size:25px}.sectionHead{gap:8px;margin-bottom:16px}.featured{padding:24px;min-height:320px}.featureBody h3{font-size:30px}.projectList{padding:0 22px}.notes>div:last-child{padding:0 22px}.noteTitle h3{font-size:18px}.profileLinks{justify-content:flex-start;gap:24px}.intro{padding:24px}.actions{gap:16px}}
 @media(prefers-reduced-transparency:reduce){.intro,.featured{box-shadow:none}}
+
+/* Keep the author below the shell's measured sticky navigation. */
+.intro{top:calc(var(--_app-shell-header-height, 64px) + 20px)}
+.home{scroll-margin-top:96px}
+.featured{background:#164dcc;color:#fff!important;box-shadow:0 12px 28px #164dcc20;transition:background .2s ease,box-shadow .2s ease}
+.featured:hover{background:#123fa9;box-shadow:0 16px 32px #164dcc28}
+.featured .meta,.featureBody p{color:#e3ecff}
+.featured .meta>span:first-child{background:#fff;color:#164dcc}
+.featured .tags span{background:#ffffff1f;color:#fff}
+.featured .roundArrow{background:#fff;color:#164dcc}
+.featureBody h3{font-size:clamp(30px,3.2vw,48px);line-height:1.2}
+.projectList{background:var(--surface)}
+.project h3,.noteTitle h3{transition:color .18s ease}
+.project .meta>span:last-child{color:var(--accent)}
+.intro{background:var(--surface);border:1px solid var(--line);box-shadow:none}
+.monogram{background:#dce7ff;color:#194ac5}
+.home .noteMeta{color:var(--muted)}
+.notesIntro{padding-top:12px}
+@media(max-height:760px){.intro{position:static}}
+@media(max-width:760px){.intro{position:static}.featureBody h3{font-size:32px}.featured{min-height:340px}.home{scroll-margin-top:80px}}
+@media(prefers-reduced-motion:reduce){.home *{transition:none!important}}
