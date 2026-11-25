@@ -27,7 +27,7 @@ export default function NoteDetail({note, newer, older}) {
 
   // 让 Markdown 的标题带上锚点 id，目录才能跳转和滚动监听
   const headingPlugins = useMemo(() => [createMarkdownHeadingLinks()], [])
-  const {items: tocItems} = useOutlineFromMarkdown(note.content, {plugins: headingPlugins})
+  const tocItems = useOutlineFromMarkdown(note.content, {plugins: headingPlugins})
 
   // 阅读进度
   const [progress, setProgress] = useState(0)
