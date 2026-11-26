@@ -17,6 +17,7 @@ git pull
 
 echo "==> 安装依赖"
 npm install
+node scripts/migrate-content.mjs
 
 echo "==> 构建（SSG 页面在构建时查数据库，.env.local 必须已配置）"
 npm run build

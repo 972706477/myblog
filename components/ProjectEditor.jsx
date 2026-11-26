@@ -19,6 +19,7 @@ import {useMediaQuery} from '@astryxdesign/core/hooks'
 import {useToast} from '@astryxdesign/core/Toast'
 import {api} from '@/lib/api'
 import MarkdownImport from './MarkdownImport'
+import CoverUpload from './CoverUpload'
 
 const STATUS_OPTIONS = ['进行中', '已完成', '已归档']
 
@@ -232,9 +233,10 @@ export default function ProjectEditor({slug}) {
                 label="在首页置顶展示"
                 value={form.featured}
                 onChange={update('featured')}
-                description="置顶项目会在首页以大卡片展示，同时列表页不再重复出现"
+                description="首页只保留一个置顶项目。保存后，其他项目会自动取消置顶。"
               />
               <Divider />
+              <CoverUpload value={form.coverUrl} onChange={update('coverUrl')} disabled={saving || importing} onBusyChange={setImporting} />
               <MarkdownImport
                 content={form.content}
                 onImport={update('content')}

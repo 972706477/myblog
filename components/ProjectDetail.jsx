@@ -83,7 +83,7 @@ export default function ProjectDetail({project, newer, older, recommendations}) 
       {/* 正文 + 右侧信息栏 */}
       <HStack gap={8} vAlign="start" wrap="wrap">
         <StackItem size="fill" style={{flex: '1 1 640px', minWidth: 0}}>
-          <Markdown headingLevelStart={2} plugins={headingPlugins}>
+          <Markdown headingLevelStart={2} plugins={headingPlugins} contentWidth="100%">
             {project.content}
           </Markdown>
         </StackItem>

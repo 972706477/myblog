@@ -84,7 +84,7 @@ export default function NoteDetail({note, newer, older, recommendations}) {
       <HStack gap={8} vAlign="start" wrap="wrap">
         <StackItem size="fill" style={{flex: '1 1 640px', minWidth: 0}}>
           {/* headingLevelStart={2} 让正文标题从 h2 开始，保证页面大纲层级正确 */}
-          <Markdown headingLevelStart={2} plugins={headingPlugins}>
+          <Markdown headingLevelStart={2} plugins={headingPlugins} contentWidth="100%">
             {note.content}
           </Markdown>
         </StackItem>

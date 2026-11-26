@@ -36,6 +36,7 @@ jobs:
             cd ${{ secrets.SERVER_PATH || '/www/wwwroot/myblog' }}
             git pull
             npm install
+            node scripts/migrate-content.mjs
             npm run build
             if pm2 describe blog > /dev/null 2>&1; then
               pm2 restart blog

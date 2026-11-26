@@ -17,6 +17,7 @@ import {useMediaQuery} from '@astryxdesign/core/hooks'
 import {useToast} from '@astryxdesign/core/Toast'
 import {api} from '@/lib/api'
 import MarkdownImport from './MarkdownImport'
+import CoverUpload from './CoverUpload'
 
 const emptyNote = {
   title: '',
@@ -177,6 +178,7 @@ export default function NoteEditor({slug}) {
                 onChange={update('readingTime')}
               />
               <Divider />
+              <CoverUpload value={form.coverUrl} onChange={update('coverUrl')} disabled={saving || importing} onBusyChange={setImporting} />
               <MarkdownImport
                 content={form.content}
                 onImport={update('content')}
