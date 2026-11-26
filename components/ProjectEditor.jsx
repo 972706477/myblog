@@ -142,19 +142,22 @@ export default function ProjectEditor({slug}) {
           <Card padding={6}>
             <Stack gap={5}>
               <TextInput
-                label="项目名称"
-                isRequired
+                label="项目名称（必填）"
+                aria-required="true"
                 value={form.name}
                 onChange={update('name')}
                 placeholder="例如：像素天气桌面小组件"
               />
-              <TextInput
-                label="网址后缀（slug）"
-                value={form.slug}
-                onChange={update('slug')}
-                placeholder="留空则根据名称自动生成"
-                description="前台地址：/projects/<后缀>"
-              />
+              <Stack gap={2}>
+                <TextInput
+                  label="网址后缀（slug）"
+                  value={form.slug}
+                  onChange={update('slug')}
+                  placeholder="留空则根据名称自动生成"
+                  aria-describedby="project-slug-help"
+                />
+                <Text id="project-slug-help" type="supporting">{"前台地址：/projects/<后缀>"}</Text>
+              </Stack>
               <TextArea
                 label="一句话介绍"
                 value={form.tagline}
@@ -163,14 +166,40 @@ export default function ProjectEditor({slug}) {
                 placeholder="列表卡片上显示的简介"
               />
               <HStack gap={4} vAlign="start" wrap="wrap">
-                <Stack gap={4} style={{flex: '1 1 200px', minWidth: 0}}>
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
                   <TextInput label="年份" value={form.year} onChange={update('year')} placeholder="2026" />
+                </Stack>
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
+                  <TextInput
+                    label="技术栈"
+                    value={stackText}
+                    onChange={setStackText}
+                    placeholder="React，Vite，Astryx"
+                    aria-describedby="project-stack-help"
+                  />
+                  <Text id="project-stack-help" type="supporting">用逗号分隔，会显示成标签</Text>
+                </Stack>
+              </HStack>
+              <HStack gap={4} vAlign="start" wrap="wrap">
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
                   <Selector
                     label="状态"
                     value={form.status}
                     onChange={update('status')}
                     options={STATUS_OPTIONS}
                   />
+                </Stack>
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
+                  <TextInput
+                    label="演示地址"
+                    value={form.demoUrl ?? ''}
+                    onChange={update('demoUrl')}
+                    placeholder="https://…（留空则不显示按钮）"
+                  />
+                </Stack>
+              </HStack>
+              <HStack gap={4} vAlign="start" wrap="wrap">
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
                   <Selector
                     label="封面图标"
                     value={form.icon}
@@ -178,20 +207,7 @@ export default function ProjectEditor({slug}) {
                     options={ICON_OPTIONS}
                   />
                 </Stack>
-                <Stack gap={4} style={{flex: '1 1 200px', minWidth: 0}}>
-                  <TextInput
-                    label="技术栈"
-                    value={stackText}
-                    onChange={setStackText}
-                    placeholder="React，Vite，Astryx"
-                    description="用逗号分隔，会显示成标签"
-                  />
-                  <TextInput
-                    label="演示地址"
-                    value={form.demoUrl ?? ''}
-                    onChange={update('demoUrl')}
-                    placeholder="https://…（留空则不显示按钮）"
-                  />
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
                   <TextInput
                     label="仓库地址"
                     value={form.repoUrl ?? ''}
@@ -207,14 +223,17 @@ export default function ProjectEditor({slug}) {
                 description="置顶项目会在首页以大卡片展示，同时列表页不再重复出现"
               />
               <Divider />
-              <TextArea
-                label="正文（Markdown）"
-                value={form.content}
-                onChange={update('content')}
-                rows={16}
-                placeholder={'## 为什么做它\n\n…'}
-                description="支持标题、列表、代码块等 Markdown 语法"
-              />
+              <Stack gap={2}>
+                <TextArea
+                  label="正文（Markdown）"
+                  value={form.content}
+                  onChange={update('content')}
+                  rows={16}
+                  placeholder={'## 为什么做它\n\n…'}
+                  aria-describedby="project-content-help"
+                />
+                <Text id="project-content-help" type="supporting">{"支持标题、列表、代码块等 Markdown 语法"}</Text>
+              </Stack>
             </Stack>
           </Card>
         </StackItem>
