@@ -1,14 +1,10 @@
+export const dynamic = 'force-dynamic'
+
 import ContentRecommendations from '@/components/ContentRecommendations'
 import {recommend} from '@/lib/recommendations'
 import {notFound} from 'next/navigation'
 import ProjectDetail from '@/components/ProjectDetail'
 import {getAllNotes, getAllProjects} from '@/lib/data'
-
-// SSG：构建时为每个项目生成一个静态 HTML 页面
-export async function generateStaticParams() {
-  const projects = await getAllProjects()
-  return projects.map((p) => ({slug: p.slug}))
-}
 
 // 每个项目页的浏览器标题
 export async function generateMetadata({params}) {

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import NotesView from '@/components/NotesView'
 import {getAllNotes} from '@/lib/data'
 

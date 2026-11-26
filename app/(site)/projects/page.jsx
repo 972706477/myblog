@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import ProjectsView from '@/components/ProjectsView'
 import {getAllProjects} from '@/lib/data'
 
