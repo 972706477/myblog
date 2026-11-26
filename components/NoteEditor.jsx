@@ -15,6 +15,7 @@ import {TextInput} from '@astryxdesign/core/TextInput'
 import {useMediaQuery} from '@astryxdesign/core/hooks'
 import {useToast} from '@astryxdesign/core/Toast'
 import {api} from '@/lib/api'
+import {resolveMarkdownImages} from '@/lib/markdown-images'
 
 const emptyNote = {
   title: '',
@@ -39,6 +40,7 @@ export default function NoteEditor({slug}) {
   const [saving, setSaving] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importedFile, setImportedFile] = useState('')
+  const [missingImages, setMissingImages] = useState([])
   const [error, setError] = useState('')
 
   // 编辑模式：加载现有数据
@@ -65,12 +67,15 @@ export default function NoteEditor({slug}) {
 
   const importMarkdown = async (event) => {
     const input = event.currentTarget
-    const file = input.files?.[0]
+    const files = Array.from(input.files ?? [])
     input.value = ''
-    if (!file) return
+    if (!files.length) return
     setError('')
-    if (!/\.(md|markdown)$/i.test(file.name)) {
-      setError('请选择 .md 或 .markdown 文件')
+    const markdownFiles = files.filter(file => /\.(md|markdown)$/i.test(file.name))
+    const matches = markdownFiles.filter(file => file.name === importedFile)
+    const file = matches.length === 1 ? matches[0] : markdownFiles.length === 1 ? markdownFiles[0] : null
+    if (!file) {
+      setError('请选择 Markdown 文件，或选择只包含一篇 Markdown 文章的文件夹')
       return
     }
     setImporting(true)
@@ -81,10 +86,23 @@ export default function NoteEditor({slug}) {
         return
       }
       if (form.content.trim() && !window.confirm('导入会替换当前正文，是否继续？')) return
-      update('content')(content)
+      const result = await resolveMarkdownImages(content, file.webkitRelativePath || file.name, files, async image => {
+        const body = new FormData()
+        body.append('image', image)
+        const response = await fetch('/api/note-images', {
+          method: 'POST',
+          headers: {Authorization: `Bearer ${api.getToken() ?? ''}`},
+          body,
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok || !data.url) throw new Error(`${image.name}：${data.error || '上传失败'}`)
+        return data.url
+      })
+      update('content')(result.content)
       setImportedFile(file.name)
-    } catch {
-      setError('无法读取 Markdown 文件，请确认文件使用 UTF-8 编码')
+      setMissingImages(result.missing)
+    } catch (error) {
+      setError(error instanceof TypeError ? '无法读取文件或连接服务器，请检查 UTF-8 编码和网络' : error.message)
     } finally {
       setImporting(false)
     }
@@ -149,19 +167,23 @@ export default function NoteEditor({slug}) {
           <Card padding={6}>
             <Stack gap={5}>
               <TextInput
-                label="标题"
-                isRequired
+                label="标题（必填）"
+
                 value={form.title}
+                aria-required="true"
                 onChange={update('title')}
                 placeholder="例如：useState 入门"
               />
-              <TextInput
-                label="网址后缀（slug）"
-                value={form.slug}
-                onChange={update('slug')}
-                placeholder="留空则根据标题自动生成"
-                description="前台地址：/notes/<后缀>"
-              />
+              <Stack gap={2}>
+                <TextInput
+                  label="网址后缀（slug）"
+                  value={form.slug}
+                  onChange={update('slug')}
+                  placeholder="留空则根据标题自动生成"
+                  aria-describedby="note-slug-help"
+                />
+                <Text id="note-slug-help" type="supporting">{"前台地址：/notes/<后缀>"}</Text>
+              </Stack>
               <TextArea
                 label="摘要"
                 value={form.excerpt}
@@ -170,47 +192,47 @@ export default function NoteEditor({slug}) {
                 placeholder="列表页显示的简介"
               />
               <HStack gap={4} vAlign="start" wrap="wrap">
-                <Stack gap={4} style={{flex: '1 1 200px', minWidth: 0}}>
-                  <TextInput
-                    label="发布日期"
-                    value={form.date}
-                    onChange={update('date')}
-                    placeholder="2026-11-24"
-                  />
-                  <TextInput
-                    label="阅读时长（分钟）"
-                    type="number"
-                    value={String(form.readingTime ?? '')}
-                    onChange={update('readingTime')}
-                  />
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
+                  <TextInput label="发布日期" value={form.date} onChange={update('date')} placeholder="2026-11-24" />
                 </Stack>
-                <Stack gap={4} style={{flex: '1 1 200px', minWidth: 0}}>
-                  <TextInput
-                    label="标签"
-                    value={tagsText}
-                    onChange={setTagsText}
-                    placeholder="React，Hooks"
-                    description="用逗号分隔，会显示成标签"
-                  />
+                <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
+                  <TextInput label="标签" value={tagsText} onChange={setTagsText} placeholder="React，Hooks" aria-describedby="note-tags-help" />
+                  <Text id="note-tags-help" type="supporting">用逗号分隔，会显示成标签</Text>
                 </Stack>
               </HStack>
+              <TextInput
+                label="阅读时长（分钟）"
+                type="number"
+                value={String(form.readingTime ?? '')}
+                onChange={update('readingTime')}
+              />
               <Divider />
-              <label>
-                导入 Markdown 文件{' '}
+              <label style={{display: "grid", gap: 8}}>
+                导入 Markdown 文件
                 <input type="file" accept=".md,.markdown" onChange={importMarkdown} disabled={importing || saving} />
               </label>
+              <label style={{display: "grid", gap: 8}}>
+                导入文章及图片文件夹
+                <input type="file" webkitdirectory="" onChange={importMarkdown} disabled={importing || saving} />
+              </label>
               <div role="status">
-                {importing ? '正在读取文件…' : importedFile ? `已导入 ${importedFile}` : ''}
+                {importing ? '正在读取文章并上传图片…' : importedFile ? `已导入 ${importedFile}` : ''}
+                {!importing && missingImages.length > 0 && (
+                  <p>未找到图片：{missingImages.join('、')}。请选择同时包含 Markdown 文件和这些图片的文件夹。</p>
+                )}
               </div>
-              <TextArea
-                label="正文（Markdown）"
-                isDisabled={importing}
-                value={form.content}
-                onChange={update('content')}
-                rows={16}
-                placeholder={'## 起因\n\n…'}
-                description="支持标题、列表、代码块等 Markdown 语法"
-              />
+              <Stack gap={2}>
+                <TextArea
+                  label="正文（Markdown）"
+                  isDisabled={importing}
+                  value={form.content}
+                  onChange={update('content')}
+                  rows={16}
+                  placeholder={'## 起因\n\n…'}
+                  aria-describedby="note-content-help"
+                />
+                <Text id="note-content-help" type="supporting">{"支持标题、列表、代码块等 Markdown 语法"}</Text>
+              </Stack>
             </Stack>
           </Card>
         </StackItem>
