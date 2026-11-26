@@ -8,6 +8,7 @@ import {Divider} from '@astryxdesign/core/Divider'
 import {HStack} from '@astryxdesign/core/HStack'
 import {Heading} from '@astryxdesign/core/Heading'
 import {Markdown} from '@astryxdesign/core/Markdown'
+import {MultiSelector} from '@astryxdesign/core/MultiSelector'
 import {Selector} from '@astryxdesign/core/Selector'
 import {Stack, StackItem} from '@astryxdesign/core/Stack'
 import {Switch} from '@astryxdesign/core/Switch'
@@ -17,6 +18,7 @@ import {TextInput} from '@astryxdesign/core/TextInput'
 import {useMediaQuery} from '@astryxdesign/core/hooks'
 import {useToast} from '@astryxdesign/core/Toast'
 import {api} from '@/lib/api'
+import MarkdownImport from './MarkdownImport'
 
 const STATUS_OPTIONS = ['进行中', '已完成', '已归档']
 
@@ -32,7 +34,7 @@ const ICON_OPTIONS = [
   'copy',
   'clock',
   'calendar',
-]
+].map(icon => ({value: icon, label: icon, icon}))
 
 const emptyProject = {
   name: '',
@@ -56,25 +58,33 @@ export default function ProjectEditor({slug}) {
   const isNew = !slug
 
   const [form, setForm] = useState(emptyProject)
-  const [stackText, setStackText] = useState('')
+  const [savedOptions, setSavedOptions] = useState([])
+  const [optionsLoading, setOptionsLoading] = useState(true)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
+  const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
 
-  // 编辑模式：加载现有数据
+  // 加载已有选项以及当前编辑的内容
   useEffect(() => {
-    if (isNew) return
     let alive = true
     api.listProjects().then((list) => {
       const found = list.find((p) => p.slug === slug)
       if (!alive) return
+      setSavedOptions([...new Set(list.flatMap(item => item.stack ?? []))])
+      if (isNew) return
       if (found) {
         setForm(found)
-        setStackText((found.stack ?? []).join('，'))
       } else {
         setError('没有找到这个项目')
       }
-      setLoading(false)
+    }).catch(error => {
+      if (alive) setError(error.message)
+    }).finally(() => {
+      if (alive) {
+        setLoading(false)
+        setOptionsLoading(false)
+      }
     })
     return () => {
       alive = false
@@ -93,10 +103,6 @@ export default function ProjectEditor({slug}) {
     try {
       const payload = {
         ...form,
-        stack: stackText
-          .split(/[，,、\s]+/)
-          .map((s) => s.trim())
-          .filter(Boolean),
         demoUrl: form.demoUrl?.trim() || null,
         repoUrl: form.repoUrl?.trim() || null,
       }
@@ -129,6 +135,7 @@ export default function ProjectEditor({slug}) {
             label={saving ? '保存中…' : '保存'}
             variant="primary"
             isLoading={saving}
+            isDisabled={importing}
             onClick={handleSave}
           />
         </HStack>
@@ -170,14 +177,19 @@ export default function ProjectEditor({slug}) {
                   <TextInput label="年份" value={form.year} onChange={update('year')} placeholder="2026" />
                 </Stack>
                 <Stack gap={2} style={{flex: '1 1 200px', minWidth: 0}}>
-                  <TextInput
+                  <MultiSelector
                     label="技术栈"
-                    value={stackText}
-                    onChange={setStackText}
-                    placeholder="React，Vite，Astryx"
-                    aria-describedby="project-stack-help"
+                    options={[...new Set([...savedOptions, ...(form.stack ?? [])])]}
+                    value={form.stack ?? []}
+                    onChange={update('stack')}
+                    hasSearch
+                    hasCreate
+                    isLoading={optionsLoading}
+                    triggerDisplay="badges"
+                    placeholder="选择或新增技术栈"
+                    searchPlaceholder="搜索或输入新技术栈"
+                    width="100%"
                   />
-                  <Text id="project-stack-help" type="supporting">用逗号分隔，会显示成标签</Text>
                 </Stack>
               </HStack>
               <HStack gap={4} vAlign="start" wrap="wrap">
@@ -223,9 +235,18 @@ export default function ProjectEditor({slug}) {
                 description="置顶项目会在首页以大卡片展示，同时列表页不再重复出现"
               />
               <Divider />
+              <MarkdownImport
+                content={form.content}
+                onImport={update('content')}
+                importing={importing}
+                setImporting={setImporting}
+                saving={saving}
+                setError={setError}
+              />
               <Stack gap={2}>
                 <TextArea
                   label="正文（Markdown）"
+                  isDisabled={importing}
                   value={form.content}
                   onChange={update('content')}
                   rows={16}
