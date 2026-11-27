@@ -11,7 +11,7 @@ export default function AnimatedIcon({name = '文件夹', size = 28}) {
     let disposed = false
     let cleanup
     setReady(false)
-    import('@/lib/kubai-icons/runtime').then(({mountBlogIcon}) => {
+    import('@/lib/kubai-icons/line-runtime').then(({mountBlogIcon}) => {
       if (disposed || !host.current) return
       cleanup = mountBlogIcon(name, host.current, host.current.closest('a,button,[role="button"]') || host.current.parentElement.parentElement)
       setReady(true)

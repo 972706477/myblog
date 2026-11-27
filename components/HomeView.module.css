@@ -52,3 +52,5 @@
 @media(prefers-reduced-motion:reduce){.home *{transition:none!important}}
 
 .home{padding:0 0 40px;column-gap:0;row-gap:32px}.work,.notes{padding:24px}.intro{border:0;border-radius:0;box-shadow:none}@media(max-width:760px){.home{padding:0 0 24px}.work,.notes{padding:16px}.intro{border:0;border-radius:0}}
+
+.featured h3{color:#fff}.home{min-width:0}.workGrid>*{min-width:0}.featured .meta{flex-wrap:wrap}

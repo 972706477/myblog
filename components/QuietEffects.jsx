@@ -1,19 +1,15 @@
 'use client'
 
-import {Component, useState} from 'react'
+import {Component, useEffect, useState} from 'react'
 import dynamic from 'next/dynamic'
 import styles from './QuietEffects.module.css'
 
-const ParticleReveal = dynamic(() => import('./canvasui/ParticleReveal').then(m => m.ParticleReveal), {ssr: false})
+const Asciify = dynamic(() => import('./canvasui/Asciify').then(m => m.Asciify), {ssr: false})
 
 class DecorationBoundary extends Component {
   state = {failed: false}
   static getDerivedStateFromError() {return {failed: true}}
   render() {return this.state.failed ? null : this.props.children}
-}
-
-function canAnimate() {
-  return window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches
 }
 
 export function QuietGlass({children, style}) {
@@ -24,12 +20,21 @@ export function QuietGlass({children, style}) {
 }
 
 export function ProfileParticles() {
-  const [active, setActive] = useState(false)
-  const artwork = <div style={{height: 80, display: 'flex', alignItems: 'center', gap: 12, padding: 16}}>{['#5886ff', '#8fa6ff', '#5dc8ce', '#b8c4ee'].map((color, index) => <span key={color} style={{display:'block', width: 18 + index * 6, height: 18 + index * 6, borderRadius: '50%', background: color}} />)}</div>
-  return <div aria-hidden="true" style={{height:80, marginBottom:16, borderRadius:12, overflow:'hidden'}} onMouseEnter={() => setActive(canAnimate())} onMouseLeave={() => setActive(false)}>
-    <div style={{position:'relative',height:80}}>
-      {artwork}
-      {active && <DecorationBoundary><div style={{position:'absolute',inset:0,pointerEvents:'none'}}><ParticleReveal radius={140} scatter={3} drift={0} aberration={0} bend={0} fade={0.25} size={1} background="#1c1c1e">{artwork}</ParticleReveal></div></DecorationBoundary>}
+  const [enabled, setEnabled] = useState(false)
+  const [reduced, setReduced] = useState(true)
+  useEffect(() => {
+    const query = matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => {setReduced(query.matches); setEnabled(!query.matches)}
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  return <section className={styles.experiment} aria-label="互动光迹">
+    <div className={styles.canvas}>
+      <div aria-hidden="true" className={styles.canvasBase} />
+      {enabled && !reduced && <DecorationBoundary><Asciify source="gradient" background="#071a35" colors={['#1e4075','#408bff','#70d9ef','#e2f9ff']} cellSize={10} radius={115} trail={0.8} flow={0.3} density={0.9} opacity={1} contrast={1.4} ambient={0.55} glow={0.25} flicker={0} grain={0} veil={0} click="ring" style={{position:'absolute',inset:0}} /></DecorationBoundary>}
+      <div className={styles.canvasLabel}><span>让灵感留下光迹</span><small>{reduced ? '静态展示 · 已遵循减少动态效果设置' : enabled ? '移动鼠标或轻触画布，试试看' : '动态效果已暂停'}</small></div>
     </div>
-  </div>
+    <button type="button" className={styles.toggle} disabled={reduced} aria-pressed={enabled && !reduced} onClick={() => setEnabled(value => !value)}>{enabled && !reduced ? '暂停光迹' : '开启光迹'}</button>
+  </section>
 }

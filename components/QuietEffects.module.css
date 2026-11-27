@@ -2,3 +2,11 @@
 .highlight{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;background:linear-gradient(125deg,transparent 25%,#ffffff16 48%,transparent 70%);transition:opacity 220ms ease}
 @media(hover:hover) and (pointer:fine){.glass:hover .highlight{opacity:1}}
 @media(prefers-reduced-motion:reduce){.highlight{display:none;transition:none}}
+.experiment{margin:8px 0 20px;min-width:0}
+.canvas{height:210px;position:relative;border-radius:14px;overflow:hidden;background:#071a35;isolation:isolate}
+.canvasBase{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 25%,#2660a855,transparent 60%),radial-gradient(ellipse at 85% 80%,#227f8844,transparent 65%);pointer-events:none}
+.canvasLabel{position:absolute;left:18px;right:18px;bottom:18px;display:grid;gap:8px;color:#f1f7ff;pointer-events:none;text-shadow:0 1px 5px #071a35}
+.canvasLabel span{font-size:18px;font-weight:600}
+.canvasLabel small{font-size:12px;line-height:1.6;color:#b9cce6}
+.toggle{display:block;min-height:44px;padding:8px 0;color:inherit;background:transparent;border:0;font:inherit;font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.toggle:focus-visible{outline:2px solid #408bff;outline-offset:3px}.toggle:disabled{opacity:.6;cursor:default}

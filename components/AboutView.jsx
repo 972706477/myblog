@@ -9,6 +9,7 @@ import {Heading} from '@astryxdesign/core/Heading'
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList'
 import {Stack} from '@astryxdesign/core/Stack'
 import {Text} from '@astryxdesign/core/Text'
+import {ProfileParticles} from './QuietEffects'
 
 // 关于页视图：宽屏下用两列布局（数据由服务端页面传入）
 export default function AboutView({projects, notes, author}) {
@@ -34,6 +35,8 @@ export default function AboutView({projects, notes, author}) {
       </Stack>
 
       <Divider />
+
+      <ProfileParticles />
 
       {/* 两列：左边在做什么，右边常用技术 */}
       <Grid columns={{minWidth: 340, max: 2}} gap={8}>
