@@ -19,6 +19,20 @@ export function QuietGlass({children, style}) {
   </div>
 }
 
+export function FeaturedBackdrop({enabled}) {
+  const [reduced, setReduced] = useState(true)
+  useEffect(() => {
+    const query = matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReduced(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  return <span aria-hidden="true" style={{position:'absolute',inset:0,pointerEvents:'none',zIndex:0}}>
+    {enabled && !reduced && <DecorationBoundary><Asciify source="gradient" background="#164dcc" colors={['#2356bb','#488fff','#81e4ff','#effbff']} cellSize={11} radius={135} trail={0.8} flow={0.3} density={0.9} opacity={0.85} contrast={1.4} ambient={0.4} glow={0.2} flicker={0} grain={0} veil={0} click="none" style={{position:'absolute',inset:0}} /></DecorationBoundary>}
+  </span>
+}
+
 export function ProfileParticles() {
   const [enabled, setEnabled] = useState(false)
   const [reduced, setReduced] = useState(true)
