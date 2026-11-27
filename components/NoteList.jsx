@@ -1,4 +1,5 @@
 import {QuietGlass} from './QuietEffects'
+import AnimatedIcon from './AnimatedIcon'
 import {Badge} from '@astryxdesign/core/Badge'
 import {Divider} from '@astryxdesign/core/Divider'
 import {HStack} from '@astryxdesign/core/HStack'
@@ -21,7 +22,7 @@ export default function NoteList({list}) {
                 {note.date}
               </Text>
               <Stack gap={1} style={{flex: '1 1 260px', minWidth: 0}}>
-                <Text type="label">{note.title}</Text>
+                <Text type="label"><AnimatedIcon name="文档" size={24} /> {note.title}</Text>
                 <Text type="supporting" maxLines={1}>
                   {note.excerpt}
                 </Text>

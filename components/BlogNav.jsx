@@ -11,6 +11,7 @@ import {TopNav, TopNavHeading, TopNavItem} from '@astryxdesign/core/TopNav'
 import {useSiteTheme} from '@/app/providers'
 import {themes} from '@/themes.js'
 import SearchPalette from './SearchPalette.jsx'
+import AnimatedIcon from './AnimatedIcon'
 
 // 顶部导航栏：博客名 + 菜单 + 搜索按钮 + 主题切换 + 暗色模式开关
 export default function BlogNav() {
@@ -60,7 +61,7 @@ export default function BlogNav() {
           <HStack gap={3} vAlign="center" wrap="wrap">
             <IconButton
               label="搜索"
-              icon={<Icon icon="search" />}
+              icon={<AnimatedIcon name="搜索" size={24} />}
               variant="ghost"
               tooltip="搜索项目和笔记（Ctrl/⌘ + K）"
               onClick={() => setSearchOpen(true)}

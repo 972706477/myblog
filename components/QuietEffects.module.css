@@ -1,0 +1,4 @@
+.glass{position:relative;border-radius:12px;isolation:isolate}
+.highlight{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;background:linear-gradient(125deg,transparent 25%,#ffffff16 48%,transparent 70%);transition:opacity 220ms ease}
+@media(hover:hover) and (pointer:fine){.glass:hover .highlight{opacity:1}}
+@media(prefers-reduced-motion:reduce){.highlight{display:none;transition:none}}

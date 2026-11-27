@@ -1,0 +1,4 @@
+.icon{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;flex-shrink:0;pointer-events:none}
+.icon svg{width:100%;height:100%;overflow:visible;display:block}
+.icon :global(.ol){fill:none;stroke-width:2}
+.icon :global(.ln){fill:none;stroke-width:1.6;stroke-linecap:round}

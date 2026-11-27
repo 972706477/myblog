@@ -1,5 +1,6 @@
 'use client'
 
+import AnimatedIcon from './AnimatedIcon'
 import {useRef, useState} from 'react'
 import {Button} from '@astryxdesign/core/Button'
 import {Stack} from '@astryxdesign/core/Stack'
@@ -84,7 +85,7 @@ export default function MarkdownImport({content: existingContent, onImport, impo
         style={{padding: 24, border: `2px dashed ${dragging ? '#007aff' : '#888'}`, borderRadius: 12, background: dragging ? 'rgba(0,122,255,.12)' : 'transparent'}}
         aria-busy={importing}
       >
-        <p style={{margin: '0 0 8px', fontWeight: 600}}>把文章文件夹拖到这里</p>
+        <p style={{margin: '0 0 8px', fontWeight: 600}}><AnimatedIcon name="上传" size={32} /> 把文章文件夹拖到这里</p>
         <p style={{margin: '0 0 16px', fontSize: 14}}>包含一篇 Markdown 和配套图片，支持子文件夹。也可以点击选择。</p>
         <Button
           label="导入 Markdown 文件夹"
