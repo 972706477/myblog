@@ -1,3 +1,4 @@
+import {QuietGlass} from './QuietEffects'
 import {Badge} from '@astryxdesign/core/Badge'
 import {ClickableCard} from '@astryxdesign/core/ClickableCard'
 import {HStack} from '@astryxdesign/core/HStack'
@@ -22,7 +23,7 @@ export default function ProjectCard({project}) {
       elevation="low"
     >
       <Stack gap={3}>
-        {project.coverUrl && <img src={project.coverUrl} alt="" loading="lazy" style={{width: '100%', aspectRatio: '16 / 9', maxHeight: 280, objectFit: 'cover', borderRadius: 12, marginBottom: 12}} />}
+        {project.coverUrl && <QuietGlass><img src={project.coverUrl} alt="" loading="lazy" style={{width: '100%', aspectRatio: '16 / 9', maxHeight: 280, objectFit: 'cover', borderRadius: 12, marginBottom: 12}} /></QuietGlass>}
         <HStack gap={3} vAlign="center">
           <Icon icon={project.icon} size="lg" style={{width: 28, height: 28}} />
           <Heading level={3}>{project.name}</Heading>

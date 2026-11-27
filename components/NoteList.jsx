@@ -1,3 +1,4 @@
+import {QuietGlass} from './QuietEffects'
 import {Badge} from '@astryxdesign/core/Badge'
 import {Divider} from '@astryxdesign/core/Divider'
 import {HStack} from '@astryxdesign/core/HStack'
@@ -15,7 +16,7 @@ export default function NoteList({list}) {
           {i > 0 && <Divider />}
           <Link href={`/notes/${note.slug}`} isStandalone>
             <HStack gap={4} vAlign="center" wrap="wrap" paddingBlock={3}>
-              {note.coverUrl && <img src={note.coverUrl} alt="" loading="lazy" style={{width: 140, maxWidth: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: 10}} />}
+              {note.coverUrl && <QuietGlass><img src={note.coverUrl} alt="" loading="lazy" style={{width: 140, maxWidth: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: 10}} /></QuietGlass>}
               <Text type="supporting" hasTabularNumbers width={96}>
                 {note.date}
               </Text>
